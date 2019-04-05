@@ -1,6 +1,6 @@
-#### Tarea 1 Redes
+# Tarea 1 Redes
 
-### Integrantes:
+## Integrantes:
 - Francisco Abarca
 - Sebastian Godinez
 - Alexander Ruz
