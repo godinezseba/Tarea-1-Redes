@@ -1,21 +1,37 @@
-import java.io.IOException;
+// entrada y salida
+import java.util.Scanner;
 import java.io.PrintStream;
+
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Scanner;
 
-public class Servidor {
+public class Servidor{
     public static void main(String[] args) throws IOException {
-        int number, temp;
-        ServerSocket s1 = new ServerSocket(1342);
-        Socket ss = s1.accept();
-        Scanner sc = new Scanner(ss.getInputStream());
+        // recibo el mensaje
+        String mensaje;
+        // creo los sockets
+        ServerSocket ss = new ServerSocket(1234); 
+        Socket cs = new Socket(); // comienza el socket y espera clientes
 
-        number = sc.nextInt();
+        // entrada de un cliente
+        System.out.println("Esperando...");
+        cs = ss.accept();
+        System.out.println("Cliente en línea");
 
-        temp = number * 2;
+        // entrada y salida de datos
+        Scanner entradaDatos = new Scanner(cs.getInputStream()); // entrada
+        PrintStream salidaDatos = new PrintStream(cs.getOutputStream()); // salida
+        
+        // leo un mensaje
+        mensaje = entradaDatos.nextLine();
+        System.out.println(mensaje);
 
-        PrintStream p = new PrintStream(ss.getOutputStream());
-        p.println(temp);
+        // envio un mensaje
+        salidaDatos.println("Servidor: Hola Cliente");
+
+        System.out.println("Fin de la conexión");
+
+        ss.close();
     }
 }
