@@ -20,17 +20,16 @@ public class Cliente {
         InputStream in = null;
         OutputStream out = null;
         // abro el archivo
-        File file = new File("./../files/test.txt");
-        long length = file.length();
+        File file = new File("./../filein/test.txt");
 
         byte[] bytes = new byte[16*1024];
 
-        // envio un mensaje
-        salidaDatos.println("Cliente: Hola soy un cliente!");
-
         // recibo un mensaje
         mensaje = entradaDatos.nextLine();
-        System.out.println(mensaje);        
+        System.out.println(mensaje);  
+
+        // envio un mensaje
+        salidaDatos.println("Cliente: Respuesta recibida");      
         
         // envio el archivo
         in = new FileInputStream(file);

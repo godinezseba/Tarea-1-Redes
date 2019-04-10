@@ -1,15 +1,17 @@
 // entrada y salida
 import java.util.Scanner;
 import java.io.PrintStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.FileOutputStream;
+import java.io.File;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.IOException;
+
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.io.File;
-import java.io.IOException;
-import java.io.FileOutputStream;
 public class Servidor{
     public static void main(String[] args) throws IOException {
         // recibo el mensaje
@@ -46,20 +48,19 @@ public class Servidor{
             System.err.println("No se pudo obtener el input");
         }
 
+        // envio un mensaje
+        salidaDatos.println("Servidor: Hola Cliente");
 
         // leo un mensaje
         mensaje = entradaDatos.nextLine();
         System.out.println(mensaje);
 
-        // envio un mensaje
-        salidaDatos.println("Servidor: Hola Cliente");
-
         // creo el archivo a guardar
         try {
-            out = new FileOutputStream("./../files/test2.txt");
+            out = new FileOutputStream("./../fileout/test.txt");
         } catch (FileNotFoundException e) {
             try {
-                File file = new File("./../files/test2.txt");
+                File file = new File("./../fileout/test.txt");
                 file.createNewFile();
             } catch (Exception er) {
                 System.err.println("Error al crear el archivo");
@@ -77,6 +78,7 @@ public class Servidor{
         out.close();
         in.close();
         entradaDatos.close();
+        salidaDatos.close();
         ss.close();
         cs.close();
 
