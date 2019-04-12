@@ -1,5 +1,6 @@
 /.vscode
 /fileout
+/filein
 /build
 Servidor.jar
 Cliente.jar

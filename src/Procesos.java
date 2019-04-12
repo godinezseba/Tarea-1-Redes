@@ -53,16 +53,19 @@ public class Procesos implements Runnable{
                 }else if (mensaje.matches("^ls$")) {
                     File folder = new File(".");
                     File[] ListOfFiles = folder.listFiles();
+                    String temp = "";
                     //salidaDatos.println("Recibi tu ls");
                     for (int i = 0; i < ListOfFiles.length; i++){
                         if(ListOfFiles[i].isFile()){
-                            salidaDatos.println("Archivo "+ ListOfFiles[i].getName());
+                            temp = temp + "Archivo "+ ListOfFiles[i].getName() + " ";
                         }
                         else if(ListOfFiles[i].isDirectory()){
-                            salidaDatos.println("Carpeta "+ListOfFiles[i].getName());
+                            temp = temp + "Carpeta "+ListOfFiles[i].getName() + " ";
                         }
                     }
-                }else if(mensaje.matches("^get [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){
+                    salidaDatos.println(temp);
+                } 
+                else if(mensaje.matches("^get [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){ // comando get
                     mensaje = mensaje.substring(4); // obtengo el nombre del archivo
                     try {
                         archivo = new File("./"+mensaje);
@@ -75,7 +78,6 @@ public class Procesos implements Runnable{
                         }
 
                         in.close();
-                        archivo.close();
                         salidaDatos.println("Archivo " + mensaje + " enviado con exito!");
 
                     } catch (Exception e) {
@@ -83,18 +85,20 @@ public class Procesos implements Runnable{
                         salidaDatos.println("Error al enviar el archivo");
                     }
 
-                }else if(mensaje.matches("^delete [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){
+                }
+                else if(mensaje.matches("^delete [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){ // comando delete
                     mensaje = mensaje.substring(7);
                     System.out.println("archivo es "+mensaje);
                     File file = new File("./"+mensaje);
                     if (file.delete()){ 
-                        salidaDatos.println("Se elimino"+ mensaje);
+                        salidaDatos.println("Se elimino "+ mensaje);
                     }
                     else {
                         salidaDatos.println("Error al eliminar el archivo");
                     }
                     //salidaDatos.println("Recibi tu delete");
-                }else if(mensaje.matches("^put [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){
+                }
+                else if(mensaje.matches("^put [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){ // comando 
                     salidaDatos.println("Recibi tu put");
                 }else{ 
                     salidaDatos.println("Mensaje no valido");

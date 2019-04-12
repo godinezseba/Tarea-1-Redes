@@ -1,15 +1,18 @@
 // entrada y salida
-import java.io.PrintStream;
 import java.util.Scanner;
-
-import java.io.IOException;
+import java.io.PrintStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.Socket;
-
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.File;
+// excepciones
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.IOException;
+// sockets y hebras
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.lang.Thread;
 public class Cliente {
     public static void main(String[] args) throws IOException {
         String mensaje, mensajeterminal;
@@ -18,8 +21,8 @@ public class Cliente {
         
 
         // entrada y salida de datos
-        Scanner entradaDatos = new Scanner(cs.getInputStream()); // entrada
-        PrintStream salidaDatos = new PrintStream(cs.getOutputStream()); // salida
+        Scanner entradaDatos = new Scanner(socket.getInputStream()); // entrada
+        PrintStream salidaDatos = new PrintStream(socket.getOutputStream()); // salida
         // para los archivos
         InputStream in = null;
         OutputStream out = null;
@@ -46,7 +49,7 @@ public class Cliente {
             }
             else if(mensaje.matches("^get [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){
                 mensaje = mensaje.substring(4);
-                
+
                 // recibo el archivo
                 in = socket.getInputStream();
                 try {
@@ -60,10 +63,16 @@ public class Cliente {
                         System.err.println("Error al crear el archivo");
                     }
                 }
+
                 int count;
                 while((count = in.read(bytes)) > 0){
                     out.write(bytes,0,count);
                 }
+                in.close();
+                out.close();
+
+                mensaje = entradaDatos.nextLine();
+                System.out.println(mensaje);
             }
             else{
                 mensaje = entradaDatos.nextLine();
@@ -74,6 +83,6 @@ public class Cliente {
         System.out.println("Fin de la conexión");
         inputterminal.close();
         entradaDatos.close();
-        cs.close();
+        socket.close();
     }
 }
