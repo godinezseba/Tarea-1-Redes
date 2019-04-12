@@ -33,6 +33,8 @@ public class Servidor{
         // INICIO DEL THREADPOOL
         piscina = new PoolHebras(10);
 
+        // mkdir filein (para guardar los archivos que ingreso)
+
 
         while (true) {
             System.out.println("Esperando...");

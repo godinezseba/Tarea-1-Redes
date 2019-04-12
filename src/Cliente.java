@@ -12,7 +12,7 @@ import java.io.FileInputStream;
 public class Cliente {
     public static void main(String[] args) throws IOException {
         String mensaje, mensajeterminal;
-        Socket cs = new Socket("127.0.0.1", 1234);
+        Socket cs = new Socket("localhost", 1234);
         Scanner inputterminal;
 
         // entrada y salida de datos
@@ -40,7 +40,11 @@ public class Cliente {
             // veo como tratar la respuesta al comando
             if (mensajeterminal.equals("Exit")) {
                 break;
-            }else{
+            }
+            else if(mensaje.matches("^get [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){
+                // recibo el archivo
+            }
+            else{
                 mensaje = entradaDatos.nextLine();
                 System.out.println(mensaje);
             }

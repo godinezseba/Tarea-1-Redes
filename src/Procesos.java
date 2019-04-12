@@ -13,18 +13,29 @@ import java.io.IOException;
 import java.lang.Thread;
 import java.net.Socket;
 public class Procesos implements Runnable{
+    // variables que entrega el server
     final Scanner entradaDatos;
     final PrintStream salidaDatos;
     final Socket socket;
+    // variaibles que manejo
+    private InputStream in;
+    private OutputStream out;
+    private File archivo;
     
     public Procesos(Socket socket, Scanner entradaDatos, PrintStream salidaDatos){
         this.entradaDatos = entradaDatos;
         this.salidaDatos = salidaDatos;
         this.socket = socket;
+        try {
+            this.out = socket.getOutputStream();
+        } catch (Exception e) {
+            System.err.println("Error al crear la salida de datos");
+        }
     }
 
     public void run() {
         String mensaje;
+        byte[] bytes = new byte[16*1024];
         // handshake
         // envio un mensaje
         salidaDatos.println("Servidor: Hola Cliente");
@@ -45,7 +56,23 @@ public class Procesos implements Runnable{
                 }else if (mensaje.matches("^ls$")) {
                     salidaDatos.println("Recibi tu ls");
                 }else if(mensaje.matches("^get [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){
-                    salidaDatos.println("Recibi tu get");
+                    mensaje = mensaje.substring(4);
+                    try {
+                        archivo = new File("./filein/"+mensaje);
+                        in = new FileInput(archivo);
+                        
+                        int count;
+                        while((count = in.read(bytes)) > 0){
+                            out.write(bytes, o, count);
+                        }
+                        in.close();
+                        archivo.close();
+                        salidaDatos.println("Archivo " + mensaje + " enviado con exito!");
+                    } catch (Exception e) {
+                        System.err.println("Error al crear las variables de entrada y salida de archivos");
+                        salidaDatos.println("Error al enviar el archivo");
+                    }
+
                 }else if(mensaje.matches("^delete [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){
                     salidaDatos.println("Recibi tu delete");
                 }else if(mensaje.matches("^put [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){
@@ -62,6 +89,7 @@ public class Procesos implements Runnable{
         try {
             this.entradaDatos.close();
             this.entradaDatos.close();
+            this.out.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
