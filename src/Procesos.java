@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.File;
-
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.IOException;
@@ -26,11 +26,8 @@ public class Procesos implements Runnable{
         this.entradaDatos = entradaDatos;
         this.salidaDatos = salidaDatos;
         this.socket = socket;
-        try {
-            this.out = socket.getOutputStream();
-        } catch (Exception e) {
-            System.err.println("Error al crear la salida de datos");
-        }
+        this.in = null;
+        this.out = null;
     }
 
     public void run() {
@@ -54,7 +51,7 @@ public class Procesos implements Runnable{
                     this.socket.close();
                     break;
                 }else if (mensaje.matches("^ls$")) {
-                    File folder = new File("./filein");
+                    File folder = new File(".");
                     File[] ListOfFiles = folder.listFiles();
                     //salidaDatos.println("Recibi tu ls");
                     for (int i = 0; i < ListOfFiles.length; i++){
@@ -66,18 +63,21 @@ public class Procesos implements Runnable{
                         }
                     }
                 }else if(mensaje.matches("^get [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){
-                    mensaje = mensaje.substring(4);
+                    mensaje = mensaje.substring(4); // obtengo el nombre del archivo
                     try {
-                        archivo = new File("./filein/"+mensaje);
-                        in = new FileInput(archivo);
+                        archivo = new File("./"+mensaje);
+                        in = new FileInputStream(archivo);
+                        out = socket.getOutputStream();
                         
                         int count;
                         while((count = in.read(bytes)) > 0){
-                            out.write(bytes, o, count);
+                            out.write(bytes, 0, count);
                         }
+
                         in.close();
                         archivo.close();
                         salidaDatos.println("Archivo " + mensaje + " enviado con exito!");
+
                     } catch (Exception e) {
                         System.err.println("Error al crear las variables de entrada y salida de archivos");
                         salidaDatos.println("Error al enviar el archivo");
@@ -86,7 +86,7 @@ public class Procesos implements Runnable{
                 }else if(mensaje.matches("^delete [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){
                     mensaje = mensaje.substring(7);
                     System.out.println("archivo es "+mensaje);
-                    File file = new File("./filein/"+mensaje);
+                    File file = new File("./"+mensaje);
                     if (file.delete()){ 
                         salidaDatos.println("Se elimino"+ mensaje);
                     }
@@ -96,8 +96,7 @@ public class Procesos implements Runnable{
                     //salidaDatos.println("Recibi tu delete");
                 }else if(mensaje.matches("^put [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){
                     salidaDatos.println("Recibi tu put");
-                }else{
-                    
+                }else{ 
                     salidaDatos.println("Mensaje no valido");
                 }
             } catch (Exception e) {
