@@ -5,83 +5,53 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.File;
-
+// excepciones
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.IOException;
-
+// sockets y hebras
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.lang.Thread;
 public class Servidor{
-    public static void main(String[] args) throws IOException {
-        // recibo el mensaje
-        String mensaje;
-        ServerSocket ss = null;
-
-        // creo los sockets
+    public static void main(String[] args) throws IOException{
+        // creo las variables basicas a usar por el server
+        Socket socket = null;
+        Scanner entradaDatos = null;
+        PrintStream salidaDatos = null;
+        ServerSocket serversocket = null;
+        Thread control = null; // objeto con el que se re direcciona a una clase
+        // creo el socket
         try{
-            ss = new ServerSocket(1234); 
+            serversocket = new ServerSocket(1234); 
         } catch(IOException e){
             System.err.println("No se pudo abrir el puerto");
-            //exit(-1);
-        }
-        Socket cs = null;
-        InputStream in = null;
-        OutputStream out = null;
-
-        System.out.println("Esperando...");
-
-        // entrada de un cliente
-        try {
-            cs = ss.accept(); // comienza el socket y espera clientes
-            System.out.println("Cliente en línea");
-        } catch (Exception e) {
-            System.err.println("Error en la entrada de un cliente");
+            System.exit(-1);
         }
 
-        // entrada y salida de datos
-        Scanner entradaDatos = new Scanner(cs.getInputStream()); // entrada
-        PrintStream salidaDatos = new PrintStream(cs.getOutputStream()); // salida
-        try {
-            in = cs.getInputStream();
-        } catch (Exception e) {
-            System.err.println("No se pudo obtener el input");
-        }
+        while (true) {
+            System.out.println("Esperando...");
 
-        // envio un mensaje
-        salidaDatos.println("Servidor: Hola Cliente");
-
-        // leo un mensaje
-        mensaje = entradaDatos.nextLine();
-        System.out.println(mensaje);
-
-        // creo el archivo a guardar
-        try {
-            out = new FileOutputStream("./../fileout/test.txt");
-        } catch (FileNotFoundException e) {
             try {
-                File file = new File("./../fileout/test.txt");
-                file.createNewFile();
-            } catch (Exception er) {
-                System.err.println("Error al crear el archivo");
+                socket = serversocket.accept(); // entrada de un cliente
+                System.out.println("Cliente en línea");
+
+                // creo las variables de entrada y salida de datos
+                entradaDatos = new Scanner(socket.getInputStream());
+                salidaDatos = new PrintStream(socket.getOutputStream()); 
+
+                // ahora la hebra trabaja con el cliente
+                control = new ControlCliente(socket, entradaDatos, salidaDatos);
+                control.start();
+
+            } catch (Exception e) {
+                System.err.println("Error en la entrada de un cliente");
+                e.printStackTrace();
+                socket.close();
             }
         }
-
-        byte[] bytes = new byte[16*1024];
-
-        int count;
-        while((count = in.read(bytes)) > 0){
-            out.write(bytes, 0, count);
-        }
-        System.out.println("Fin de la conexión");
-
-        out.close();
-        in.close();
-        entradaDatos.close();
-        salidaDatos.close();
-        ss.close();
-        cs.close();
-
-        //ss.close();
+        // termino del servidor
+        //System.out.println("Fin de la ejecución");
+        //serversocket.close();
     }
 }

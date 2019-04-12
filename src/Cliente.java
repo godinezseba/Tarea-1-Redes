@@ -11,18 +11,19 @@ import java.io.File;
 import java.io.FileInputStream;
 public class Cliente {
     public static void main(String[] args) throws IOException {
-        String mensaje;
+        String mensaje, mensajeterminal;
         Socket cs = new Socket("127.0.0.1", 1234);
+        Scanner inputterminal;
 
         // entrada y salida de datos
         Scanner entradaDatos = new Scanner(cs.getInputStream()); // entrada
         PrintStream salidaDatos = new PrintStream(cs.getOutputStream()); // salida
-        InputStream in = null;
-        OutputStream out = null;
-        // abro el archivo
-        File file = new File("./../filein/test.txt");
+        // InputStream in = null;
+        // OutputStream out = null;
+        // // abro el archivo
+        // File file = new File("./../filein/test.txt");
 
-        byte[] bytes = new byte[16*1024];
+        // byte[] bytes = new byte[16*1024];
 
         // recibo un mensaje
         mensaje = entradaDatos.nextLine();
@@ -30,20 +31,32 @@ public class Cliente {
 
         // envio un mensaje
         salidaDatos.println("Cliente: Respuesta recibida");      
-        
-        // envio el archivo
-        in = new FileInputStream(file);
-        out = cs.getOutputStream();
+        inputterminal = new Scanner(System.in);
+        // paso de mensajes
+        while(true){
+            mensajeterminal = inputterminal.nextLine();
 
-        int count;
-        while((count = in.read(bytes)) > 0){
-            out.write(bytes, 0, count);
+            salidaDatos.println(mensajeterminal);
+            // veo como tratar la respuesta al comando
+            if (mensajeterminal.equals("Exit")) {
+                break;
+            }else{
+                mensaje = entradaDatos.nextLine();
+                System.out.println(mensaje);
+            }
         }
+
+        // envio el archivo
+        // in = new FileInputStream(file);
+        // out = cs.getOutputStream();
+
+        // int count;
+        // while((count = in.read(bytes)) > 0){
+        //     out.write(bytes, 0, count);
+        // }
         
         System.out.println("Fin de la conexión");
-
-        out.close();
-        in.close();
+        inputterminal.close();
         entradaDatos.close();
         cs.close();
     }
