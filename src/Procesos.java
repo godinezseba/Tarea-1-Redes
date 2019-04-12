@@ -54,7 +54,17 @@ public class Procesos implements Runnable{
                     this.socket.close();
                     break;
                 }else if (mensaje.matches("^ls$")) {
-                    salidaDatos.println("Recibi tu ls");
+                    File folder = new File("./filein");
+                    File[] ListOfFiles = folder.listFiles();
+                    //salidaDatos.println("Recibi tu ls");
+                    for (int i = 0; i < ListOfFiles.length; i++){
+                        if(ListOfFiles[i].isFile()){
+                            salidaDatos.println("Archivo "+ ListOfFiles[i].getName());
+                        }
+                        else if(ListOfFiles[i].isDirectory()){
+                            salidaDatos.println("Carpeta "+ListOfFiles[i].getName());
+                        }
+                    }
                 }else if(mensaje.matches("^get [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){
                     mensaje = mensaje.substring(4);
                     try {
@@ -74,10 +84,20 @@ public class Procesos implements Runnable{
                     }
 
                 }else if(mensaje.matches("^delete [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){
-                    salidaDatos.println("Recibi tu delete");
+                    mensaje = mensaje.substring(7);
+                    System.out.println("archivo es "+mensaje);
+                    File file = new File("./filein/"+mensaje);
+                    if (file.delete()){ 
+                        salidaDatos.println("Se elimino"+ mensaje);
+                    }
+                    else {
+                        salidaDatos.println("Error al eliminar el archivo");
+                    }
+                    //salidaDatos.println("Recibi tu delete");
                 }else if(mensaje.matches("^put [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){
                     salidaDatos.println("Recibi tu put");
                 }else{
+                    
                     salidaDatos.println("Mensaje no valido");
                 }
             } catch (Exception e) {

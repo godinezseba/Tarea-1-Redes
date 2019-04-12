@@ -14,6 +14,7 @@ public class Cliente {
         String mensaje, mensajeterminal;
         Socket cs = new Socket("localhost", 1234);
         Scanner inputterminal;
+        
 
         // entrada y salida de datos
         Scanner entradaDatos = new Scanner(cs.getInputStream()); // entrada
