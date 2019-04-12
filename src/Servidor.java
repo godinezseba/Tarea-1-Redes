@@ -29,6 +29,8 @@ public class Servidor{
             System.exit(-1);
         }
 
+        // INICIO DEL THREADPOOL
+
         while (true) {
             System.out.println("Esperando...");
 

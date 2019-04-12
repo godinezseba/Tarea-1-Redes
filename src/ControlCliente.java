@@ -43,10 +43,14 @@ public class ControlCliente extends Thread{
                 if(mensaje.equals("Exit")){
                     this.socket.close();
                     break;
-                }else if (mensaje.equals("Hola")) {
-                    salidaDatos.println("Recibi tu hola");
-                }else if(mensaje.equals("Mundo")){
-                    salidaDatos.println("Recibi tu mundo");
+                }else if (mensaje.matches("^ls$")) {
+                    salidaDatos.println("Recibi tu ls");
+                }else if(mensaje.matches("^get [a-zA-Z0-9]* \\.[a-zA-Z0-9]*$")){
+                    salidaDatos.println("Recibi tu get");
+                }else if(mensaje.matches("^delete [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){
+                    salidaDatos.println("Recibi tu delete");
+                }else if(mensaje.matches("^put [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){
+                    salidaDatos.println("Recibi tu put");
                 }else{
                     salidaDatos.println("Mensaje no valido");
                 }
