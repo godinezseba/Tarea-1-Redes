@@ -20,7 +20,8 @@ public class Servidor{
         Scanner entradaDatos = null;
         PrintStream salidaDatos = null;
         ServerSocket serversocket = null;
-        Thread control = null; // objeto con el que se re direcciona a una clase
+        PoolHebras piscina = null; // piscina de hebras
+
         // creo el socket
         try{
             serversocket = new ServerSocket(1234); 
@@ -30,6 +31,8 @@ public class Servidor{
         }
 
         // INICIO DEL THREADPOOL
+        piscina = new PoolHebras(10);
+
 
         while (true) {
             System.out.println("Esperando...");
@@ -43,8 +46,7 @@ public class Servidor{
                 salidaDatos = new PrintStream(socket.getOutputStream()); 
 
                 // ahora la hebra trabaja con el cliente
-                control = new ControlCliente(socket, entradaDatos, salidaDatos);
-                control.start();
+                piscina.ejecutar(new Procesos(socket, entradaDatos, salidaDatos));
 
             } catch (Exception e) {
                 System.err.println("Error en la entrada de un cliente");

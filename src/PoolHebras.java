@@ -15,15 +15,15 @@ import java.net.Socket;
 public class PoolHebras{
     private final int nHebras;
     private final ListaHebras[] Hebras;
-    private final LinkedBlockingQueue Cola;
+    private final LinkedBlockingQueue<Runnable> Cola;
 
     public PoolHebras(int nHebras){
         this.nHebras = nHebras;
-        Cola = new LinkedBlockingQueue();
-        Hebras = new PoolControl[nHebras];
+        Cola = new LinkedBlockingQueue<Runnable>();
+        Hebras = new ListaHebras[nHebras];
         
         for (int i=0; i < this.nHebras; i++){
-            Hebras[i] = new PoolControl();
+            Hebras[i] = new ListaHebras();
             Hebras[i].start();  
         }
     }    
@@ -33,7 +33,7 @@ public class PoolHebras{
             Cola.notify();
         }
     }
-    public class PoolControl extends Thread{
+    public class ListaHebras extends Thread{
         public void run(){
             Runnable proceso;
             while(true){
@@ -46,7 +46,7 @@ public class PoolHebras{
                             System.out.println("Ocurrio un error en la espera de la cola "+ e.getMessage());
                         }
                     }
-                    proceso = (Runnable)Cola.poll();
+                    proceso = Cola.poll();
                 }
                 try{
                     proceso.run();
