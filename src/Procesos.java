@@ -67,6 +67,7 @@ public class Procesos implements Runnable{
                 } 
                 else if(mensaje.matches("^get [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){ // comando get
                     mensaje = mensaje.substring(4); // obtengo el nombre del archivo
+                    // envio el mensaje
                     try {
                         archivo = new File("./"+mensaje);
                         in = new FileInputStream(archivo);
@@ -98,8 +99,30 @@ public class Procesos implements Runnable{
                     }
                     //salidaDatos.println("Recibi tu delete");
                 }
-                else if(mensaje.matches("^put [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){ // comando 
-                    salidaDatos.println("Recibi tu put");
+                else if(mensaje.matches("^put [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){ // comando put
+                    mensaje = mensaje.substring(4);
+
+                    // recibo el mensaje
+                    in = socket.getInputStream();
+                    try {
+                        out = new FileOutputStream(mensaje);
+                    } catch (FileNotFoundException e) {
+                        try {
+                            archivo = new File(mensaje);
+                            archivo.createNewFile();
+                            out = new FileOutputStream(mensaje);
+                        } catch (Exception er) {
+                            System.err.println("Error al crear el archivo");
+                        }
+                    }
+    
+                    int count;
+                    while((count = in.read(bytes)) > 0){
+                        out.write(bytes,0,count);
+                    }
+                    
+                    out.close();
+                    // salidaDatos.println("Recibi tu put");
                 }else{ 
                     salidaDatos.println("Mensaje no valido");
                 }
