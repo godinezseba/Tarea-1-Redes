@@ -39,6 +39,7 @@ public class Servidor{
 
             try {
                 socket = serversocket.accept(); // entrada de un cliente
+                
                 System.out.println("Cliente en línea" + socket.getRemoteSocketAddress().toString());
 
                 // creo las variables de entrada y salida de datos
