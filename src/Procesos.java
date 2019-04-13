@@ -69,23 +69,19 @@ public class Procesos implements Runnable{
                     mensaje = mensaje.substring(4); // obtengo el nombre del archivo
                     // envio el mensaje
                     try {
-                        archivo = new File("./"+mensaje);
+                        archivo = new File(mensaje);
                         in = new FileInputStream(archivo);
-                        out = socket.getOutputStream();
                         
                         int count;
                         while((count = in.read(bytes)) > 0){
-                            out.write(bytes, 0, count);
+                            salidaDatos.write(bytes, 0, count);
                         }
-
+                        // salidaDatos.println("");
                         in.close();
-                        salidaDatos.println("Archivo " + mensaje + " enviado con exito!");
-
                     } catch (Exception e) {
                         System.err.println("Error al crear las variables de entrada y salida de archivos");
                         salidaDatos.println("Error al enviar el archivo");
                     }
-
                 }
                 else if(mensaje.matches("^delete [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){ // comando delete
                     mensaje = mensaje.substring(7);

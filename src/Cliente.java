@@ -41,44 +41,41 @@ public class Cliente {
         inputterminal = new Scanner(System.in);
         // paso de mensajes
         while(true){
+            System.out.print("> ");
             mensajeterminal = inputterminal.nextLine();
-
             salidaDatos.println(mensajeterminal);
+
             // veo como tratar la respuesta al comando
             if (mensajeterminal.equals("Exit")) {
                 break;
             }
-            else if(mensaje.matches("^get [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){
-                mensaje = mensaje.substring(4);
+            else if(mensajeterminal.matches("^get [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){
+                mensajeterminal = mensajeterminal.substring(4);
 
                 // recibo el archivo
                 in = socket.getInputStream();
                 try {
-                    out = new FileOutputStream(mensaje);
+                    out = new FileOutputStream(mensajeterminal);
                 } catch (FileNotFoundException e) {
-                    try {
-                        file = new File(mensaje);
-                        file.createNewFile();
-                        out = new FileOutputStream(mensaje);
-                    } catch (Exception er) {
-                        System.err.println("Error al crear el archivo");
-                    }
+                    System.err.println("Error al solicitar el archivo");
                 }
 
                 int count;
                 while((count = in.read(bytes)) > 0){
+                    System.out.println(count);
                     out.write(bytes,0,count);
                 }
 
                 out.close();
-                mensaje = entradaDatos.nextLine();
-                System.out.println(mensaje);
+                System.out.println("Recibi el archivo");
+                // mensaje = entradaDatos.nextLine();
+                // System.out.println(mensaje);
             }
-            else if(mensaje.matches("^put [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){
-                mensaje = mensaje.substring(4); // obtengo el nombre del archivo
+            else if(mensajeterminal.matches("^put [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){
+                mensajeterminal = mensajeterminal.substring(4); // obtengo el nombre del archivo
                 // envio el mensaje
                 try {
-                    file = new File("./"+mensaje);
+                    file = new File("./"+mensajeterminal);
                     in = new FileInputStream(file);
                     out = socket.getOutputStream();
                     
@@ -88,7 +85,7 @@ public class Cliente {
                     }
 
                     in.close();
-                    salidaDatos.println("Archivo " + mensaje + " enviado con exito!");
+                    salidaDatos.println("Archivo " + mensajeterminal + " enviado con exito!");
 
                 } catch (Exception e) {
                     System.err.println("Error al crear las variables de entrada y salida de archivos");
