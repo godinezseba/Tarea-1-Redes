@@ -1,5 +1,8 @@
 // entrada y salida
 import java.util.Scanner;
+
+import javafx.scene.chart.PieChart.Data;
+
 import java.io.PrintStream;
 import java.io.StringWriter;
 import java.io.InputStream;
@@ -7,6 +10,8 @@ import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 // excepciones
@@ -75,18 +80,19 @@ public class Procesos implements Runnable{
                     mensaje = mensaje.substring(4); // obtengo el nombre del archivo
                     // envio el mensaje
                     try {
+                        // variables a usar
                         archivo = new File(mensaje);
-                        int lengthArch = (int)archivo.length();
-                        salidaDatos.println(lengthArch);
+                        byte[] bytearray = new byte[(int)archivo.length()];
+                        // entrada y salida
+                        fis = new FileInputStream(archivo);
+                        DataInputStream bis = new DataInputStream(new BufferedInputStream(fis));
+                        bis.readFully(bytearray, 0, bytearray.length);
 
-                        fis = new FileInputStream(mensaje);
-                        in = new BufferedInputStream(fis);
-                        byte[] envio = new byte[lengthArch];
-                        in.read(envio);
-
-                        for (int i = 0; i < envio.length; i++) {
-                            salidaDatos.write(envio[i]);
-                        }
+                        DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+                        // envio los datos
+                        dos.writeLong(bytearray.length);                      
+                        dos.write(bytearray, 0, bytearray.length);
+                        dos.flush();
                         // termino de enviar el archivo
                     } catch (Exception e) {
                         System.err.println("Error en el envio del archivo");
@@ -107,9 +113,16 @@ public class Procesos implements Runnable{
                 }
                 else if(mensaje.matches("^put [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){ // comando put
                     mensaje = mensaje.substring(4);
+                    int largoArch;
+                    try {
+                        largoArch = Integer.parseInt(entradaDatos.nextLine());
+                    } catch (Exception e) {
+                        System.err.println("Error al obtener el tamaño");
+                        largoArch = 0;
+                    }
 
-                    int largoArch = entradaDatos.nextInt();
-                
+                    System.out.println(largoArch);
+
                     fos = new FileOutputStream(mensaje);
                     out = new BufferedOutputStream(fos);
                     in = new BufferedInputStream(socket.getInputStream());

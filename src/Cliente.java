@@ -8,6 +8,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.DataInputStream;
 // excepciones
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -66,31 +67,33 @@ public class Cliente {
             }
             else if(mensajeterminal.matches("^get [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){
                 mensajeterminal = mensajeterminal.substring(4);
+                int bytesread;
 
-                int largoArch = entradaDatos.nextInt();
-                
+                DataInputStream entradad = new DataInputStream(socket.getInputStream());
                 fos = new FileOutputStream(mensajeterminal);
-                out = new BufferedOutputStream(fos);
-                in = new BufferedInputStream(socket.getInputStream());
-                byte[] entrada = new byte[largoArch];
-
-                for (int i = 0; i < entrada.length; i++) {
-                    entrada[i] = (byte)in.read();
+                long tamaño = entradad.readLong();
+                byte[] buffer = new byte[1024];
+                while (tamaño > 0 && (bytesread = entradad.read(buffer, 0, (int)Math.min(buffer.length, tamaño))) != -1) {
+                    fos.write(buffer, 0, bytesread);
+                    tamaño -= bytesread;
+                    System.out.println(tamaño);
                 }
-                out.write(entrada);
-                out.flush();
-                System.out.println("Hola");
+                fos.close();
+                //System.out.println("Hola");
             }
             else if(mensajeterminal.matches("^put [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){
                 mensajeterminal = mensajeterminal.substring(4); // obtengo el nombre del archivo
                 // envio el mensaje
                 try {
                     file = new File(mensajeterminal);
+
                     int lengthArch = (int)file.length();
-                    salidaDatos.println(lengthArch);
+                    
+                    salidaDatos.println(String.valueOf(lengthArch));
 
                     fis = new FileInputStream(mensajeterminal);
                     in = new BufferedInputStream(fis);
+
                     byte[] envio = new byte[lengthArch];
                     in.read(envio);
 
