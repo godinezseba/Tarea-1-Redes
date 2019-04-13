@@ -4,8 +4,11 @@ import java.io.PrintStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.FileOutputStream;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+// excepciones
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.IOException;
@@ -17,22 +20,21 @@ public class Procesos implements Runnable{
     final Scanner entradaDatos;
     final PrintStream salidaDatos;
     final Socket socket;
-    // variaibles que manejo
-    private InputStream in;
-    private OutputStream out;
-    private File archivo;
     
     public Procesos(Socket socket, Scanner entradaDatos, PrintStream salidaDatos){
         this.entradaDatos = entradaDatos;
         this.salidaDatos = salidaDatos;
         this.socket = socket;
-        this.in = null;
-        this.out = null;
     }
 
     public void run() {
         String mensaje;
-        byte[] bytes = new byte[16*1024];
+        // variable para envio de archivos
+        FileInputStream fis = null;
+        FileOutputStream fos = null;
+        BufferedOutputStream out = null;
+        BufferedInputStream in = null;
+        File archivo;
         // handshake
         // envio un mensaje
         salidaDatos.println("Servidor: Hola Cliente");
@@ -44,13 +46,15 @@ public class Procesos implements Runnable{
         //ciclo mientras recibo mensajes
         while (true) {
             try {
+
                 mensaje = entradaDatos.nextLine();
                 System.out.println(mensaje);
 
                 if(mensaje.equals("Exit")){
                     this.socket.close();
                     break;
-                }else if (mensaje.matches("^ls$")) {
+                }
+                else if (mensaje.matches("^ls$")) {
                     File folder = new File(".");
                     File[] ListOfFiles = folder.listFiles();
                     String temp = "";
@@ -70,57 +74,52 @@ public class Procesos implements Runnable{
                     // envio el mensaje
                     try {
                         archivo = new File(mensaje);
-                        in = new FileInputStream(archivo);
-                        
-                        int count;
-                        while((count = in.read(bytes)) > 0){
-                            salidaDatos.write(bytes, 0, count);
+                        int lengthArch = (int)archivo.length();
+                        salidaDatos.println(lengthArch);
+
+                        fis = new FileInputStream(mensaje);
+                        in = new BufferedInputStream(fis);
+                        byte[] envio = new byte[lengthArch];
+                        in.read(envio);
+
+                        for (int i = 0; i < envio.length; i++) {
+                            salidaDatos.write(envio[i]);
                         }
-                        // salidaDatos.println("");
-                        in.close();
+                        // termino de enviar el archivo
                     } catch (Exception e) {
-                        System.err.println("Error al crear las variables de entrada y salida de archivos");
-                        salidaDatos.println("Error al enviar el archivo");
+                        System.err.println("Error en el envio del archivo");
+                        salidaDatos.println("Error al enviar el archivo " + mensaje);
                     }
                 }
                 else if(mensaje.matches("^delete [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){ // comando delete
                     mensaje = mensaje.substring(7);
-                    System.out.println("archivo es "+mensaje);
+                    //System.out.println("archivo es "+mensaje);
                     File file = new File("./"+mensaje);
                     if (file.delete()){ 
-                        salidaDatos.println("Se elimino "+ mensaje);
+                        salidaDatos.println("Se elimino " + mensaje);
                     }
                     else {
-                        salidaDatos.println("Error al eliminar el archivo");
+                        salidaDatos.println("Error al eliminar el archivo " + mensaje);
                     }
                     //salidaDatos.println("Recibi tu delete");
                 }
                 else if(mensaje.matches("^put [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){ // comando put
                     mensaje = mensaje.substring(4);
 
-                    // recibo el mensaje
-                    in = socket.getInputStream();
-                    try {
-                        out = new FileOutputStream(mensaje);
-                    } catch (FileNotFoundException e) {
-                        try {
-                            archivo = new File(mensaje);
-                            archivo.createNewFile();
-                            out = new FileOutputStream(mensaje);
-                        } catch (Exception er) {
-                            System.err.println("Error al crear el archivo");
-                        }
-                    }
+                    int largoArch = entradaDatos.nextInt();
+                
+                    fos = new FileOutputStream(mensaje);
+                    out = new BufferedOutputStream(fos);
+                    in = new BufferedInputStream(socket.getInputStream());
+                    byte[] entrada = new byte[largoArch];
     
-                    int count;
-                    while((count = in.read(bytes)) > 0){
-                        out.write(bytes,0,count);
+                    for (int i = 0; i < entrada.length; i++) {
+                        entrada[i] = (byte)in.read();
                     }
-                    
-                    out.close();
-                    // salidaDatos.println("Recibi tu put");
+                    out.write(entrada);
+                    //out.flush();
                 }else{ 
-                    salidaDatos.println("Mensaje no valido");
+                    salidaDatos.println("Mensaje no valido: " + mensaje);
                 }
             } catch (Exception e) {
                 System.err.println("No se pudo obtener el mensaje");
@@ -130,8 +129,7 @@ public class Procesos implements Runnable{
         }
         try {
             this.entradaDatos.close();
-            this.entradaDatos.close();
-            this.out.close();
+            this.salidaDatos.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

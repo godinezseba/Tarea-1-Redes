@@ -4,6 +4,8 @@ import java.io.PrintStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.FileOutputStream;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 // excepciones
@@ -25,12 +27,11 @@ public class Cliente {
         Scanner entradaDatos = new Scanner(socket.getInputStream()); // entrada
         PrintStream salidaDatos = new PrintStream(socket.getOutputStream()); // salida
         // para los archivos
-        InputStream in = null;
-        OutputStream out = null;
-        // abro el archivo
+        FileInputStream fis = null;
+        FileOutputStream fos = null;
+        BufferedOutputStream out = null;
+        BufferedInputStream in = null;
         File file = null;
-
-        byte[] bytes = new byte[16*1024];
 
         // recibo un mensaje
         mensaje = entradaDatos.nextLine();
@@ -52,43 +53,39 @@ public class Cliente {
             else if(mensajeterminal.matches("^get [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){
                 mensajeterminal = mensajeterminal.substring(4);
 
-                // recibo el archivo
-                in = socket.getInputStream();
-                try {
-                    out = new FileOutputStream(mensajeterminal);
-                } catch (FileNotFoundException e) {
-                    System.err.println("Error al solicitar el archivo");
-                }
+                int largoArch = entradaDatos.nextInt();
+                
+                fos = new FileOutputStream(mensajeterminal);
+                out = new BufferedOutputStream(fos);
+                in = new BufferedInputStream(socket.getInputStream());
+                byte[] entrada = new byte[largoArch];
 
-                int count;
-                while((count = in.read(bytes)) > 0){
-                    System.out.println(count);
-                    out.write(bytes,0,count);
+                for (int i = 0; i < entrada.length; i++) {
+                    entrada[i] = (byte)in.read();
                 }
-
-                out.close();
-                System.out.println("Recibi el archivo");
-                // mensaje = entradaDatos.nextLine();
-                // System.out.println(mensaje);
+                out.write(entrada);
+                //out.flush();
             }
             else if(mensajeterminal.matches("^put [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){
                 mensajeterminal = mensajeterminal.substring(4); // obtengo el nombre del archivo
                 // envio el mensaje
                 try {
-                    file = new File("./"+mensajeterminal);
-                    in = new FileInputStream(file);
-                    out = socket.getOutputStream();
-                    
-                    int count;
-                    while((count = in.read(bytes)) > 0){
-                        out.write(bytes, 0, count);
+                    file = new File(mensajeterminal);
+                    int lengthArch = (int)file.length();
+                    salidaDatos.println(lengthArch);
+
+                    fis = new FileInputStream(mensajeterminal);
+                    in = new BufferedInputStream(fis);
+                    byte[] envio = new byte[lengthArch];
+                    in.read(envio);
+
+                    for (int i = 0; i < envio.length; i++) {
+                        salidaDatos.write(envio[i]);
                     }
-
-                    in.close();
-                    salidaDatos.println("Archivo " + mensajeterminal + " enviado con exito!");
-
+                    // termino de enviar el archivo
                 } catch (Exception e) {
-                    System.err.println("Error al crear las variables de entrada y salida de archivos");
+                    System.err.println("Error en el envio del archivo " + mensajeterminal);
+                    e.printStackTrace();
                     salidaDatos.println("Error al enviar el archivo");
                 }
             }
