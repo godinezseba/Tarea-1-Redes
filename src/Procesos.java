@@ -93,6 +93,8 @@ public class Procesos implements Runnable{
                         dos.writeLong(bytearray.length);                      
                         dos.write(bytearray, 0, bytearray.length);
                         dos.flush();
+                        // cierro lo que no necesito
+                        bis.close();
                         // termino de enviar el archivo
                     } catch (Exception e) {
                         System.err.println("Error en el envio del archivo");
@@ -113,26 +115,18 @@ public class Procesos implements Runnable{
                 }
                 else if(mensaje.matches("^put [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){ // comando put
                     mensaje = mensaje.substring(4);
-                    int largoArch;
-                    try {
-                        largoArch = Integer.parseInt(entradaDatos.nextLine());
-                    } catch (Exception e) {
-                        System.err.println("Error al obtener el tamaño");
-                        largoArch = 0;
-                    }
+                    int bytesread;
 
-                    System.out.println(largoArch);
-
+                    DataInputStream entradad = new DataInputStream(socket.getInputStream());
                     fos = new FileOutputStream(mensaje);
-                    out = new BufferedOutputStream(fos);
-                    in = new BufferedInputStream(socket.getInputStream());
-                    byte[] entrada = new byte[largoArch];
-    
-                    for (int i = 0; i < entrada.length; i++) {
-                        entrada[i] = (byte)in.read();
+                    long tamaño = entradad.readLong();
+                    byte[] buffer = new byte[1024];
+                    while (tamaño > 0 && (bytesread = entradad.read(buffer, 0, (int)Math.min(buffer.length, tamaño))) != -1) {
+                        fos.write(buffer, 0, bytesread);
+                        tamaño -= bytesread;
+                        System.out.println(tamaño);
                     }
-                    out.write(entrada);
-                    out.flush();
+                    fos.close();
                 }else{ 
                     salidaDatos.println("Mensaje no valido: " + mensaje);
                 }

@@ -1,22 +1,26 @@
 // entrada y salida
 import java.util.Scanner;
+
+import javafx.scene.chart.PieChart.Data;
+
 import java.io.PrintStream;
+import java.io.StringWriter;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.DataInputStream;
 // excepciones
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.IOException;
-// sockets y hebras
-import java.net.ServerSocket;
-import java.net.Socket;
+// hebras y sockets
 import java.lang.Thread;
+import java.net.Socket;
 public class Cliente {
     public static void main(String[] args) throws IOException {
         String mensaje, mensajeterminal;
@@ -85,26 +89,25 @@ public class Cliente {
                 mensajeterminal = mensajeterminal.substring(4); // obtengo el nombre del archivo
                 // envio el mensaje
                 try {
-                    file = new File(mensajeterminal);
+                    // variables a usar
+                    File archivo = new File(mensajeterminal);
+                    byte[] bytearray = new byte[(int)archivo.length()];
+                    // entrada y salida
+                    fis = new FileInputStream(archivo);
+                    DataInputStream bis = new DataInputStream(new BufferedInputStream(fis));
+                    bis.readFully(bytearray, 0, bytearray.length);
 
-                    int lengthArch = (int)file.length();
-                    
-                    salidaDatos.println(String.valueOf(lengthArch));
-
-                    fis = new FileInputStream(mensajeterminal);
-                    in = new BufferedInputStream(fis);
-
-                    byte[] envio = new byte[lengthArch];
-                    in.read(envio);
-
-                    for (int i = 0; i < envio.length; i++) {
-                        salidaDatos.write(envio[i]);
-                    }
+                    DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+                    // envio los datos
+                    dos.writeLong(bytearray.length);                      
+                    dos.write(bytearray, 0, bytearray.length);
+                    dos.flush();
+                    // cierro lo que no necesito
+                    bis.close();
                     // termino de enviar el archivo
                 } catch (Exception e) {
-                    System.err.println("Error en el envio del archivo " + mensajeterminal);
-                    e.printStackTrace();
-                    salidaDatos.println("Error al enviar el archivo");
+                    System.err.println("Error en el envio del archivo");
+                    salidaDatos.println("Error al enviar el archivo " + mensaje);
                 }
             }
             else{
