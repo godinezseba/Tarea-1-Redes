@@ -84,8 +84,8 @@ public class Procesos implements Runnable{
                         archivo = new File(mensaje);
                         byte[] bytearray = new byte[(int)archivo.length()];
                         // entrada y salida
-                        fis = new FileInputStream(archivo);
-                        DataInputStream bis = new DataInputStream(new BufferedInputStream(fis));
+                        // fis = new FileInputStream(archivo);
+                        DataInputStream bis = new DataInputStream(new FileInputStream(archivo));
                         bis.readFully(bytearray, 0, bytearray.length);
 
                         DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
@@ -111,7 +111,7 @@ public class Procesos implements Runnable{
                     else {
                         salidaDatos.println("Error al eliminar el archivo " + mensaje);
                     }
-                    //salidaDatos.println("Recibi tu delete");
+                    
                 }
                 else if(mensaje.matches("^put [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){ // comando put
                     mensaje = mensaje.substring(4);
@@ -132,7 +132,6 @@ public class Procesos implements Runnable{
                 }
             } catch (Exception e) {
                 System.err.println("No se pudo obtener el mensaje");
-                //e.printStackTrace();
                 break;
             }
         }

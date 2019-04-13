@@ -49,3 +49,6 @@ DATE TIME                 EVENT                DESCRIPTION
 13-04-2019 19:55:52connection         /127.0.0.1:55756         Conexion entrante 
 DATE TIME                 EVENT                DESCRIPTION
 13-04-2019 20:08:05connection         /127.0.0.1:55796         Conexion entrante 
+DATE TIME                 EVENT                DESCRIPTION
+13-04-2019 20:21:56connection         /127.0.0.1:55906         Conexion entrante 
+13-04-2019 20:21:56connection         /127.0.0.1:55970         Conexion entrante 

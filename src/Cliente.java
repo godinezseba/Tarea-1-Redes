@@ -36,7 +36,6 @@ public class Cliente {
         FileOutputStream fos = null;
         BufferedOutputStream out = null;
         BufferedInputStream in = null;
-        File file = null;
 
         // recibo un mensaje
         mensaje = entradaDatos.nextLine();
@@ -93,8 +92,7 @@ public class Cliente {
                     File archivo = new File(mensajeterminal);
                     byte[] bytearray = new byte[(int)archivo.length()];
                     // entrada y salida
-                    fis = new FileInputStream(archivo);
-                    DataInputStream bis = new DataInputStream(new BufferedInputStream(fis));
+                    DataInputStream bis = new DataInputStream(new FileInputStream(archivo));
                     bis.readFully(bytearray, 0, bytearray.length);
 
                     DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
