@@ -1,6 +1,7 @@
 // entrada y salida
 import java.util.Scanner;
 import java.io.PrintStream;
+import java.io.StringWriter;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.FileOutputStream;
@@ -12,7 +13,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.IOException;
-
+// hebras y sockets
 import java.lang.Thread;
 import java.net.Socket;
 public class Procesos implements Runnable{
@@ -48,26 +49,27 @@ public class Procesos implements Runnable{
             try {
 
                 mensaje = entradaDatos.nextLine();
-                System.out.println(mensaje);
+                System.out.println(socket.getRemoteSocketAddress().toString() + " " + mensaje);
 
                 if(mensaje.equals("Exit")){
                     this.socket.close();
                     break;
                 }
-                else if (mensaje.matches("^ls$")) {
+                else if (mensaje.equals("ls")) {
                     File folder = new File(".");
                     File[] ListOfFiles = folder.listFiles();
-                    String temp = "";
-                    //salidaDatos.println("Recibi tu ls");
+                    // System.out.println(String.valueOf(ListOfFiles.length));
+                    // entrego la cantidad de mensajes que enviare para imprimirlos
+                    salidaDatos.println(String.valueOf(ListOfFiles.length));
+                    
                     for (int i = 0; i < ListOfFiles.length; i++){
                         if(ListOfFiles[i].isFile()){
-                            temp = temp + "Archivo "+ ListOfFiles[i].getName() + " ";
+                            salidaDatos.println("Archivo "+ ListOfFiles[i].getName());
                         }
                         else if(ListOfFiles[i].isDirectory()){
-                            temp = temp + "Carpeta "+ListOfFiles[i].getName() + " ";
+                            salidaDatos.println("Carpeta " + ListOfFiles[i].getName());
                         }
                     }
-                    salidaDatos.println(temp);
                 } 
                 else if(mensaje.matches("^get [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){ // comando get
                     mensaje = mensaje.substring(4); // obtengo el nombre del archivo
@@ -117,7 +119,7 @@ public class Procesos implements Runnable{
                         entrada[i] = (byte)in.read();
                     }
                     out.write(entrada);
-                    //out.flush();
+                    out.flush();
                 }else{ 
                     salidaDatos.println("Mensaje no valido: " + mensaje);
                 }

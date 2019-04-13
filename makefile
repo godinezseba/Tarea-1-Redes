@@ -20,7 +20,7 @@ clean:
 	if [ -d build ]; then rm build -R; fi
 
 runserver:
-	java -jar Servidor.jar
+	java -jar Servidor.jar 
 
 runclient:
-	java -jar Cliente.jar
+	java -jar fileout/Cliente.jar 

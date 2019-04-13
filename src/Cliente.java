@@ -50,6 +50,20 @@ public class Cliente {
             if (mensajeterminal.equals("Exit")) {
                 break;
             }
+            else if(mensajeterminal.equals("ls")){
+                int largo;
+                try {
+                    largo = Integer.parseInt(entradaDatos.nextLine()); 
+                } catch (Exception e) {
+                    System.out.println("Error al obtener el valor");
+                    largo = 0;
+                }
+
+                for (int i = 0; i < largo; i++) {
+                    mensaje = entradaDatos.nextLine();
+                    System.out.println(mensaje);
+                }
+            }
             else if(mensajeterminal.matches("^get [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){
                 mensajeterminal = mensajeterminal.substring(4);
 
@@ -64,7 +78,8 @@ public class Cliente {
                     entrada[i] = (byte)in.read();
                 }
                 out.write(entrada);
-                //out.flush();
+                out.flush();
+                System.out.println("Hola");
             }
             else if(mensajeterminal.matches("^put [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){
                 mensajeterminal = mensajeterminal.substring(4); // obtengo el nombre del archivo
@@ -98,6 +113,7 @@ public class Cliente {
         System.out.println("Fin de la conexión");
         inputterminal.close();
         entradaDatos.close();
+        salidaDatos.close();
         socket.close();
     }
 }
