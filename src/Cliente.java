@@ -24,7 +24,7 @@ import java.net.Socket;
 public class Cliente {
     public static void main(String[] args) throws IOException {
         String mensaje, mensajeterminal;
-        Socket socket = new Socket("localhost", 1234);
+        Socket socket = new Socket("192.168.0.16", 1234);
         Scanner inputterminal;
         
 
@@ -32,10 +32,7 @@ public class Cliente {
         Scanner entradaDatos = new Scanner(socket.getInputStream()); // entrada
         PrintStream salidaDatos = new PrintStream(socket.getOutputStream()); // salida
         // para los archivos
-        FileInputStream fis = null;
         FileOutputStream fos = null;
-        BufferedOutputStream out = null;
-        BufferedInputStream in = null;
 
         // recibo un mensaje
         mensaje = entradaDatos.nextLine();
@@ -68,7 +65,7 @@ public class Cliente {
                     System.out.println(mensaje);
                 }
             }
-            else if(mensajeterminal.matches("^get [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){
+            else if(mensajeterminal.matches("^get [a-zA-Z0-9]+(\\.[a-zA-Z0-9]+)*$")){
                 mensajeterminal = mensajeterminal.substring(4);
                 int bytesread;
 
@@ -84,7 +81,7 @@ public class Cliente {
                 fos.close();
                 //System.out.println("Hola");
             }
-            else if(mensajeterminal.matches("^put [a-zA-Z0-9]*\\.[a-zA-Z0-9]*$")){
+            else if(mensajeterminal.matches("^put [a-zA-Z0-9]+(\\.[a-zA-Z0-9]+)*$")){
                 mensajeterminal = mensajeterminal.substring(4); // obtengo el nombre del archivo
                 // envio el mensaje
                 try {
