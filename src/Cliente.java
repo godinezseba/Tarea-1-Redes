@@ -24,7 +24,7 @@ import java.net.Socket;
 public class Cliente {
     public static void main(String[] args) throws IOException {
         String mensaje, mensajeterminal;
-        Socket socket = new Socket("192.168.0.16", 1234);
+        Socket socket = new Socket("localhost", 1234);
         Scanner inputterminal;
         
 

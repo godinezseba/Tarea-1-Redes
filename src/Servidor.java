@@ -38,8 +38,13 @@ public class Servidor{
         BufferedWriter bw = null;
         FileWriter fw = null;
         File log = new File("log.txt");
-        if(!log.exists()){
-            log.createNewFile();
+        if(log.exists()){
+            log.delete();
+            try {
+                log.createNewFile();
+            } catch (Exception e) {
+                System.err.println("Error al crear el archivo log.txt");
+            }
         }
         contenido = "DATE TIME                 EVENT                DESCRIPTION";
         fw = new FileWriter(log.getAbsoluteFile(), true);
