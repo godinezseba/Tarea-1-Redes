@@ -52,10 +52,7 @@ public class Procesos implements Runnable{
     public void run() {
         String mensaje;
         // variable para envio de archivos
-        FileInputStream fis = null;
         FileOutputStream fos = null;
-        BufferedOutputStream out = null;
-        BufferedInputStream in = null;
         File archivo;
         // handshake
         // envio un mensaje
